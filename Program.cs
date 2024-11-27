@@ -1,4 +1,5 @@
 using DeployBlazorTest.Components;
+using Serilog;
 
 namespace DeployBlazorTest
 {
@@ -12,15 +13,18 @@ namespace DeployBlazorTest
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+
+            app.UseExceptionHandler("/Error");
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseSerilogRequestLogging();
+            app.UseHsts();
+
 
             app.UseHttpsRedirection();
 
